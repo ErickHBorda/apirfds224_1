@@ -9,9 +9,9 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+//import com.zaxxer.hikari.HikariConfig;
+//import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 public class MariaDbConfig {
@@ -31,17 +31,11 @@ public class MariaDbConfig {
         return dataSource;*/
 
         //SQL SERVER
-        /*SQLServerDataSource dataSource = new SQLServerDataSource();
-        
-        try {
-            dataSource.setURL("jdbc:sqlserver://localhost:1433;databaseName=dbgeneral");
-            dataSource.setUser("sa");
-            dataSource.setPassword("111");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return dataSource;*/
+        SQLServerDataSource dataSource = new SQLServerDataSource();
+        dataSource.setURL("jdbc:sqlserver://localhost:1433;encrypt=true;trustServerCertificate=true;databaseName=dbgeneral");
+        dataSource.setUser("sa");
+        dataSource.setPassword("111");
+        return dataSource;
 
         //POSTGRESQL
         /*HikariConfig config = new HikariConfig();
@@ -51,18 +45,18 @@ public class MariaDbConfig {
         config.setPassword("111");
         config.setDriverClassName("org.postgresql.Driver");
 
-        return new HikariDataSource(config);*/
+        return new HikariDataSource(config);
         
 
         //ORACLE
-        HikariConfig config = new HikariConfig();
+        /*HikariConfig config = new HikariConfig();
 
         config.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:XE"); // Cambia según tu configuración de Oracle
         config.setUsername("system");
         config.setPassword("111");
         config.setDriverClassName("oracle.jdbc.OracleDriver");
 
-        return new HikariDataSource(config); 
+        return new HikariDataSource(config); */
     } 
     
 }
