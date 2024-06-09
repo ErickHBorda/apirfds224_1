@@ -41,15 +41,15 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
     	</dependency>
 		
 		<dependency>
-    		<groupId>org.postgresql</groupId>
-    		<artifactId>postgresql</artifactId>
-    		<version>42.3.3</version> 
-		</dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.3.7</version> <!-- Verifica la última versión en Maven Central -->
+    	</dependency>
 		
 		<dependency>
-    		<groupId>com.oracle.database.jdbc</groupId>
-    		<artifactId>ojdbc11</artifactId>
-    		<version>21.3.0.0</version>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<version>19.8.0.0</version> <!-- Esta versión puede variar -->
 		</dependency>	
 
 		<dependency>
