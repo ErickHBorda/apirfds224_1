@@ -2,7 +2,6 @@ package com.iis.app.bussiness.general.person;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +20,6 @@ import com.iis.app.bussiness.general.person.request.SoUpdate;
 import com.iis.app.bussiness.general.person.response.SoGetAll;
 import com.iis.app.dto.DtoPerson;
 import com.iis.app.service.PersonService;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
 
 @RestController
 @RequestMapping("person")
