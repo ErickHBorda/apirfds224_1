@@ -8,16 +8,22 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iis.app.bussiness.general.person.request.SoInsert;
+import com.iis.app.bussiness.general.person.request.SoUpdate;
 import com.iis.app.bussiness.general.person.response.SoGetAll;
 import com.iis.app.dto.DtoPerson;
 import com.iis.app.service.PersonService;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -62,5 +68,29 @@ public class PersonController {
 		}
 
 		return new ResponseEntity<>(listSoPersonGet, HttpStatus.OK);
+	}
+
+	@DeleteMapping(value="delete/{idPerson}")
+	public ResponseEntity<Boolean> actionDelete(@PathVariable String idPerson){
+		personService.delete(idPerson);
+		return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
+	}
+
+	@PostMapping(path = "update",consumes = {"multipart/form-data"})
+	public ResponseEntity<Boolean> actionUpdate(@ModelAttribute SoUpdate soUpdate) {
+		
+		try {
+			DtoPerson dtoPerson = new DtoPerson();
+			dtoPerson.setIdPerson(soUpdate.getIdPerson());
+			dtoPerson.setFirstName(soUpdate.getFirstName());
+			dtoPerson.setSurName(soUpdate.getSurName());
+			dtoPerson.setDni(soUpdate.getDni());
+			dtoPerson.setGender(soUpdate.isGender());
+			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soUpdate.getBirthDate()));
+
+			personService.update(dtoPerson);
+		} catch (Exception e) {}
+		
+		return new ResponseEntity<>(true, HttpStatus.OK);
 	}
 }
