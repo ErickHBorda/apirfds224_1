@@ -1,5 +1,8 @@
 package com.iis.app.bussiness.general.person.request;
 
+import lombok.Data;
+
+@Data
 public class SoUpdate {
     private String idPerson;
     private String firstName;
@@ -7,52 +10,4 @@ public class SoUpdate {
 	private String dni;
 	private boolean gender;
 	private String birthDate;
-
-    public String getIdPerson(){
-        return idPerson;
-    }
-
-    public void setIdPerson(String idPerson){
-        this.idPerson=idPerson;
-    }
-
-	public String getFirstName() {
-		return firstName;
-	}
-	
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	
-	public String getSurName() {
-		return surName;
-	}
-	
-	public void setSurName(String surName) {
-		this.surName = surName;
-	}
-	
-	public String getDni() {
-		return dni;
-	}
-	
-	public void setDni(String dni) {
-		this.dni = dni;
-	}
-	
-	public boolean isGender() {
-		return gender;
-	}
-	
-	public void setGender(boolean gender) {
-		this.gender = gender;
-	}
-	
-	public String getBirthDate() {
-		return birthDate;
-	}
-	
-	public void setBirthDate(String birthDate) {
-		this.birthDate = birthDate;
-	}
 }
