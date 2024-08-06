@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,8 +32,17 @@ public class PersonController {
 	private PersonService personService;
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
-    public ResponseEntity<Boolean> actionInsert(@Valid @ModelAttribute SoInsert soInsert) {
-        try {
+    public ResponseEntity<com.iis.app.bussiness.general.person.response.SoInsert> actionInsert(@Valid @ModelAttribute SoInsert soInsert, BindingResult bindingResult) {
+        com.iis.app.bussiness.general.person.response.SoInsert responseSoInsert = new com.iis.app.bussiness.general.person.response.SoInsert();
+		try {
+			if(bindingResult.hasErrors()){
+				bindingResult.getAllErrors().forEach(error->{
+					responseSoInsert.addResponseMesssage(error.getDefaultMessage());
+				});
+
+				return new ResponseEntity<>(responseSoInsert,HttpStatus.OK);
+			}
+
             DtoPerson dtoPerson = new DtoPerson();
             dtoPerson.setFirstName(soInsert.getFirstName());
             dtoPerson.setSurName(soInsert.getSurName());
@@ -42,32 +51,24 @@ public class PersonController {
             dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
 
             personService.insert(dtoPerson);
-            return new ResponseEntity<>(true, HttpStatus.CREATED);
+			responseSoInsert.setType("success");
+			responseSoInsert.addResponseMesssage("Operacion realizada correctamente");
+
+            return new ResponseEntity<>(responseSoInsert, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(responseSoInsert, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    /*@ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-    }*/
-
 	@GetMapping(path = "getall")
-	public ResponseEntity<List<SoGetAll>> actionGetAll() {
+	public ResponseEntity<com.iis.app.bussiness.general.person.response.SoGetAll> actionGetAll() {
+		com.iis.app.bussiness.general.person.response.SoGetAll responseSoGetAll = new com.iis.app.bussiness.general.person.response.SoGetAll();
 		List<DtoPerson> listDtoPerson = personService.getAll();
 
-		List<SoGetAll> listSoPersonGet = new ArrayList<>();
+		responseSoGetAll.setDto(new ArrayList<>());
 
 		for (DtoPerson dtoPerson : listDtoPerson) {
-			listSoPersonGet.add(new SoGetAll(
+			responseSoGetAll.getDto().add(new SoGetAll(
 				dtoPerson.getIdPerson(),
 				dtoPerson.getFirstName(),
 				dtoPerson.getSurName(),
@@ -77,7 +78,9 @@ public class PersonController {
 			));
 		}
 
-		return new ResponseEntity<>(listSoPersonGet, HttpStatus.OK);
+		responseSoGetAll.setType("success");
+		return new ResponseEntity<>(responseSoGetAll,HttpStatus.OK);
+
 	}
 
 	@DeleteMapping(value="delete/{idPerson}")
