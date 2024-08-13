@@ -51,7 +51,7 @@ public class PersonController {
             dtoPerson.setFirstName(soInsert.getFirstName());
             dtoPerson.setSurName(soInsert.getSurName());
             dtoPerson.setDni(soInsert.getDni());
-            dtoPerson.setGender(soInsert.isGender());
+            dtoPerson.setGender(soInsert.getGender());
             dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
 
             personService.insert(dtoPerson);

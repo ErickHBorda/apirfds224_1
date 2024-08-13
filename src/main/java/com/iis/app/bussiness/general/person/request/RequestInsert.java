@@ -18,7 +18,7 @@ public class RequestInsert {
 	private String dni;
 
 	@NotNull(message = "El campo \"gender\" es requerido.")
-	private boolean gender;
+	private Boolean gender;
 
 	@NotBlank(message = "El campo \"birthDate\" es requerido.")
 	private String birthDate;
