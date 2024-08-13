@@ -2,9 +2,11 @@ package com.iis.app.dto;
 
 import java.util.Date;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class DtoPerson {
     private String idPerson;
     private String firstName;

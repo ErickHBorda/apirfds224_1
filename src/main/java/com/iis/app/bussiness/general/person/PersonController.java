@@ -1,8 +1,9 @@
 package com.iis.app.bussiness.general.person;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -16,9 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iis.app.bussiness.general.person.request.SoInsert;
-import com.iis.app.bussiness.general.person.request.SoUpdate;
-import com.iis.app.bussiness.general.person.response.SoGetAll;
+import com.iis.app.bussiness.general.person.request.RequestInsert;
+import com.iis.app.bussiness.general.person.request.RequestUpadate;
+import com.iis.app.bussiness.general.person.response.ResponseDelete;
+import com.iis.app.bussiness.general.person.response.ResponseGetAll;
+import com.iis.app.bussiness.general.person.response.ResponseInsert;
+import com.iis.app.bussiness.general.person.response.ResponseUpdate;
 import com.iis.app.dto.DtoPerson;
 import com.iis.app.service.PersonService;
 
@@ -32,67 +36,84 @@ public class PersonController {
 	private PersonService personService;
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
-    public ResponseEntity<com.iis.app.bussiness.general.person.response.SoInsert> actionInsert(@Valid @ModelAttribute SoInsert soInsert, BindingResult bindingResult) {
-        com.iis.app.bussiness.general.person.response.SoInsert responseSoInsert = new com.iis.app.bussiness.general.person.response.SoInsert();
+    public ResponseEntity<ResponseInsert> actionInsert(@Valid @ModelAttribute RequestInsert soInsert, BindingResult bindingResult) {
+        ResponseInsert responseInsert = new ResponseInsert();
 		try {
 			if(bindingResult.hasErrors()){
 				bindingResult.getAllErrors().forEach(error->{
-					responseSoInsert.addResponseMesssage(error.getDefaultMessage());
+					responseInsert.addResponseMesssage(error.getDefaultMessage());
 				});
 
-				return new ResponseEntity<>(responseSoInsert,HttpStatus.OK);
+				return new ResponseEntity<>(responseInsert,HttpStatus.OK);
 			}
 
             DtoPerson dtoPerson = new DtoPerson();
             dtoPerson.setFirstName(soInsert.getFirstName());
             dtoPerson.setSurName(soInsert.getSurName());
             dtoPerson.setDni(soInsert.getDni());
-            dtoPerson.setGender(soInsert.getGender());
+            dtoPerson.setGender(soInsert.isGender());
             dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
 
             personService.insert(dtoPerson);
-			responseSoInsert.setType("success");
-			responseSoInsert.addResponseMesssage("Operacion realizada correctamente");
+			responseInsert.success();
+			responseInsert.addResponseMesssage("Operacion realizada correctamente");
 
-            return new ResponseEntity<>(responseSoInsert, HttpStatus.CREATED);
+            return new ResponseEntity<>(responseInsert, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(responseSoInsert, HttpStatus.INTERNAL_SERVER_ERROR);
+            responseInsert.exception();
+			responseInsert.addResponseMesssage("Ocurrió un error inesperado, estamos trabajando para solucionarlo.");
+
+			return new ResponseEntity<>(responseInsert, HttpStatus.BAD_REQUEST);
         }
     }
 
 	@GetMapping(path = "getall")
-	public ResponseEntity<com.iis.app.bussiness.general.person.response.SoGetAll> actionGetAll() {
-		com.iis.app.bussiness.general.person.response.SoGetAll responseSoGetAll = new com.iis.app.bussiness.general.person.response.SoGetAll();
+	public ResponseEntity<ResponseGetAll> actionGetAll() {
+		ResponseGetAll responseGetAll = new ResponseGetAll();
 		List<DtoPerson> listDtoPerson = personService.getAll();
 
-		responseSoGetAll.setDto(new ArrayList<>());
-
 		for (DtoPerson dtoPerson : listDtoPerson) {
-			responseSoGetAll.getDto().add(new SoGetAll(
-				dtoPerson.getIdPerson(),
-				dtoPerson.getFirstName(),
-				dtoPerson.getSurName(),
-				dtoPerson.getDni(),
-				dtoPerson.getGender(),
-				dtoPerson.getBirthDate()
-			));
-		}
+			Map<String, Object> map = new HashMap<>();
 
-		responseSoGetAll.setType("success");
-		return new ResponseEntity<>(responseSoGetAll,HttpStatus.OK);
+			map.put("idPerson", dtoPerson.getIdPerson());
+			map.put("firstName", dtoPerson.getFirstName());
+            map.put("surName", dtoPerson.getSurName());
+            map.put("dni", dtoPerson.getDni());
+            map.put("gender", dtoPerson.getGender());
+            map.put("birthDate", dtoPerson.getBirthDate());
+				
+			
+			responseGetAll.dto.listPerson.add(map);
+		}
+		
+		responseGetAll.success();
+
+		return new ResponseEntity<>(responseGetAll, HttpStatus.OK);
 
 	}
 
 	@DeleteMapping(value="delete/{idPerson}")
-	public ResponseEntity<Boolean> actionDelete(@PathVariable String idPerson){
+	public ResponseEntity<ResponseDelete> actionDelete(@PathVariable String idPerson){
+		ResponseDelete responseDelete = new ResponseDelete();
 		personService.delete(idPerson);
-		return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
+		responseDelete.success();
+		responseDelete.addResponseMesssage("Operación realizada correctamente.");
+
+		return new ResponseEntity<>(responseDelete, HttpStatus.OK);
 	}
 
 	@PostMapping(path = "update",consumes = {"multipart/form-data"})
-	public ResponseEntity<Boolean> actionUpdate(@Valid @ModelAttribute SoUpdate soUpdate) {
-		
+	public ResponseEntity<ResponseUpdate> actionUpdate(@Valid @ModelAttribute RequestUpadate soUpdate, BindingResult bindingResult) {
+		ResponseUpdate responseUpdate = new ResponseUpdate();
 		try {
+
+			if(bindingResult.hasErrors()){
+				bindingResult.getAllErrors().forEach(error->{
+					responseUpdate.addResponseMesssage(error.getDefaultMessage());
+				});
+				return new ResponseEntity<>(responseUpdate, HttpStatus.OK);
+			}
+
 			DtoPerson dtoPerson = new DtoPerson();
 			dtoPerson.setIdPerson(soUpdate.getIdPerson());
 			dtoPerson.setFirstName(soUpdate.getFirstName());
@@ -102,9 +123,16 @@ public class PersonController {
 			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soUpdate.getBirthDate()));
 
 			personService.update(dtoPerson);
-			return new ResponseEntity<>(true, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+
+			responseUpdate.success();
+			responseUpdate.addResponseMesssage("Operación realizada correctamente.");
+
+			return new ResponseEntity<>(responseUpdate, HttpStatus.OK);
+		} catch (Exception e) {	
+			responseUpdate.exception();
+			responseUpdate.addResponseMesssage("Ocurrió un error inesperado, estamos trabajando para solucionarlo.");
+			return new ResponseEntity<>(responseUpdate, HttpStatus.BAD_REQUEST);
 		}	
+
 	}
 }

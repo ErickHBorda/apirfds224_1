@@ -3,10 +3,12 @@ package com.iis.app.bussiness.general.person.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class SoUpdate {
+@Getter
+@Setter
+public class RequestUpadate {
     private String idPerson;
 
 	@NotBlank(message = "El nombre no puede estar vacío")
